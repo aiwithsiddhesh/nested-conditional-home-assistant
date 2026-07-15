@@ -205,8 +205,8 @@ final_state = app.invoke(initial_state)
 - [x] Project scaffolding (`pyproject.toml`, `.python-version`, `.gitignore`)
 - [x] `.env` / `.env.example` — API key configuration
 - [x] `app/config.py` — settings loaded via `pydantic-settings`; also holds the file paths for each of the six retrieval sources (kitchen/laundry/hvac manuals, insurance policy doc) instead of hardcoding them in node code
-- [ ] `app/loaders.py` — loads each source document, splits it with `RecursiveCharacterTextSplitter` (chunk size 800, overlap 100), embeds chunks with `sentence-transformers/all-MiniLM-L6-v2` via `HuggingFaceEmbeddings`, builds a FAISS index, and returns a retriever with `k=4` — one retriever per document, values sourced from `app/config.py` (see [Retrieval](#retrieval))
-- [ ] `app/state.py` — shared graph state model
+- [x] `app/loaders.py` — loads each source document, splits it with `RecursiveCharacterTextSplitter` (chunk size 800, overlap 100), embeds chunks with `sentence-transformers/all-MiniLM-L6-v2` via `HuggingFaceEmbeddings`, builds a FAISS index, and returns a retriever with `k=4` — one retriever per document, values sourced from `app/config.py` (see [Retrieval](#retrieval))
+- [x] `app/state.py` — shared graph state model
 - [ ] `app/nodes/classifier.py` — level-1 classifier node, using structured output (not string-contains parsing) so a bad parse can't cascade into the wrong level-2 classifier
 - [ ] `app/nodes/appliance.py` — appliance classifier + kitchen/laundry/hvac RAG nodes, each calling `app/loaders.py` for its own retriever
 - [ ] `app/nodes/insurance.py` — insurance classifier + coverage/claim-escalation RAG nodes (the latter also sets `needs_claim_guidance`), both calling `app/loaders.py` for the shared policy retriever

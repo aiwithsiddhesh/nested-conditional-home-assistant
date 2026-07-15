@@ -15,3 +15,8 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "pypdf>=5.0.0",
 ]
+
+[dependency-groups]
+dev = [
+    "reportlab>=5.0.0",
+]
