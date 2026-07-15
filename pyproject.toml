@@ -1,0 +1,17 @@
+[project]
+name = "nested-conditional-home-assistant"
+version = "0.1.0"
+description = "A LangGraph pipeline for a home assistant with nested conditional routing (appliance/insurance/general) and RAG-backed answers"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "langgraph>=0.2.0",
+    "langchain-groq>=0.2.0",
+    "langchain-community>=0.3.0",
+    "langchain-huggingface>=0.1.0",
+    "langchain-text-splitters>=0.3.0",
+    "faiss-cpu>=1.8.0",
+    "pydantic-settings>=2.5.0",
+    "python-dotenv>=1.0.0",
+    "pypdf>=5.0.0",
+]
