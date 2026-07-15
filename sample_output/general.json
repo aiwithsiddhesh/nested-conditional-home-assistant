@@ -1,0 +1,15 @@
+{
+  "messages": [
+    {
+      "type": "human",
+      "content": "What's the best way to remove a red wine stain from a carpet?"
+    },
+    {
+      "type": "ai",
+      "content": "For a house resident: Don't panic if you've spilled red wine on your carpet - it's definitely possible to remove the stain. The key is to act quickly, as the sooner you treat the stain, the better chance you have of removing it completely. Start by blotting the stain with a clean cloth or paper towel to soak up as much of the wine as possible. Don't rub the stain, as this can push it deeper into the carpet fibers.\n\nNext, mix 1 tablespoon of white vinegar with 1 tablespoon of dish soap, and apply the solution to the stain. Let it sit for about 5-10 minutes, then rinse the area with cold water and blot it dry. If the stain is still visible, you can try applying a stain remover like hydrogen peroxide or a product specifically designed for removing wine stains.\n\nAnother option is to use baking soda to absorb the stain. Sprinkle baking soda liberally over the affected area, let it sit for about an hour, and then vacuum it up. Repeat this process if the stain is still visible. It's also a good idea to test a small, inconspicuous area of the carpet first to make sure the cleaning solution or product you're using won't damage the carpet fibers.\n\nRemember, not all stains can be completely removed, especially if they've had time to set. But with quick action and the right cleaning solutions, you should be able to remove most of the stain and prevent it from becoming a permanent fixture on your carpet."
+    }
+  ],
+  "household_type": "house",
+  "query_type": "general",
+  "retrieved_context": "NO_RETRIEVAL_NEEDED"
+}

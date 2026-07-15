@@ -212,9 +212,9 @@ final_state = app.invoke(initial_state)
 - [x] `app/nodes/insurance.py` — insurance classifier + coverage/claim-escalation RAG nodes (the latter also sets `needs_claim_guidance`), both calling `app/loaders.py` for the shared policy retriever
 - [x] `app/nodes/general.py` — general node
 - [x] `app/nodes/response.py` — final response node
-- [ ] `app/graph.py` — builds and compiles the nested-conditional `StateGraph`
-- [ ] `app/main.py` — non-interactive entrypoint (`python -m app.main <input>`), not a blocking CLI `input()` loop
-- [ ] `sample_data/` / `sample_output/` — sample manuals/policy docs and pre-generated results covering each of the six leaf branches
+- [x] `app/graph.py` — builds and compiles the nested-conditional `StateGraph`
+- [x] `app/main.py` — non-interactive entrypoint (`python -m app.main <input>`), not a blocking CLI `input()` loop
+- [x] `sample_output/` — pre-generated results covering each of the six leaf branches (`kitchen.json`, `laundry.json`, `hvac.json`, `insurance_coverage_question.json`, `insurance_active_claim.json`, `general.json`); no separate `sample_data/` since the real source docs already live in `data/manuals/`
 - [ ] `main.py` — currently a placeholder ("Hello from nested-conditional-home-assistant!"), not yet wired to the graph
 
 ## Setup
