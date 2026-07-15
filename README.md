@@ -215,6 +215,7 @@ final_state = app.invoke(initial_state)
 - [x] `app/graph.py` — builds and compiles the nested-conditional `StateGraph`
 - [x] `app/main.py` — non-interactive entrypoint (`python -m app.main <input>`), not a blocking CLI `input()` loop
 - [x] `sample_output/` — pre-generated results covering each of the six leaf branches (`kitchen.json`, `laundry.json`, `hvac.json`, `insurance_coverage_question.json`, `insurance_active_claim.json`, `general.json`); no separate `sample_data/` since the real source docs already live in `data/manuals/`
+- [x] `app/ui.py` — Streamlit chatbot UI: sidebar `household_type` selector, multi-turn chat backed by `st.session_state`, graph built once via `st.cache_resource`
 - [ ] `main.py` — currently a placeholder ("Hello from nested-conditional-home-assistant!"), not yet wired to the graph
 
 ## Setup
@@ -230,9 +231,29 @@ cp .env.example .env
 ## Run
 
 ```bash
-uv run python -m app.main
+uv run python -m app.main "My dryer stopped heating up, what should I check?" --household-type house
 ```
 
-Each run appends the AI response to the conversation state and prints
-or persists the final state, following the same convention as the
-`recipe-parallel-graph` project.
+Each run appends the AI response to the conversation state, prints the
+final answer, and persists the full final state as JSON under
+`output/run_<timestamp>/result.json`, following the same convention as
+the `recipe-parallel-graph` project.
+
+## Run the chatbot UI
+
+```bash
+uv run python -m streamlit run app/ui.py
+```
+
+Must be run as `python -m streamlit`, not the bare `streamlit` command,
+so the app is invoked from the project root and `app` resolves as a
+package (Streamlit puts the script's own directory on `sys.path`, not
+the invocation cwd).
+
+The UI has a sidebar dropdown for `household_type` (apartment / house /
+rental) and a chat window that keeps the full conversation history in
+`st.session_state`, so follow-up questions carry prior turns the same
+way `messages` accumulates in the graph. A "Clear conversation" button
+resets the session. The first load is slower than subsequent ones,
+since all four FAISS indexes are built from the sample PDFs at import
+time.
