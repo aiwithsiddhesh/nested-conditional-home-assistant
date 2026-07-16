@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(mv output/run_20260715_201847/result.json sample_output/kitchen.json)",
-      "Bash(rmdir output/run_20260715_201847)",
-      "Bash(uv run python -c ' *)"
-    ]
-  }
-}
