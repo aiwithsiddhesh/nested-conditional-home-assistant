@@ -1,9 +1,8 @@
 from typing import Literal
 
-from langchain_groq import ChatGroq
 from pydantic import BaseModel, Field
 
-from app.config import settings
+from app.classifiers import make_classifier_node
 from app.state import HomeAssistantState
 
 
@@ -18,25 +17,12 @@ class QueryTypeClassification(BaseModel):
     )
 
 
-_llm = ChatGroq(model=settings.groq_model, api_key=settings.groq_api_key, temperature=0)
-_classifier = _llm.with_structured_output(QueryTypeClassification)
-
-
-def classifier_node(state: HomeAssistantState) -> dict:
-    latest_message = state["messages"][-1].content
-
-    result = _classifier.invoke(
-        [
-            (
-                "system",
-                "Classify the homeowner's question into exactly one top-level "
-                "category: appliance, insurance, or general.",
-            ),
-            ("human", latest_message),
-        ]
-    )
-
-    return {"query_type": result.query_type}
+classifier_node = make_classifier_node(
+    QueryTypeClassification,
+    "query_type",
+    "Classify the homeowner's question into exactly one top-level category: "
+    "appliance, insurance, or general.",
+)
 
 
 def route_level1(

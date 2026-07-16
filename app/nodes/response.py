@@ -30,7 +30,12 @@ def response_node(state: HomeAssistantState) -> dict:
     if retrieved_context == NO_RETRIEVAL_MARKER:
         context_instruction = "Answer from your own general knowledge."
     else:
-        context_instruction = f"Use the following retrieved context to answer:\n\n{retrieved_context}"
+        context_instruction = (
+            "Use the following retrieved context to answer. Each excerpt is "
+            "tagged with its source page, e.g. '[page 3]' — you may mention the "
+            f"page number when it helps the homeowner locate it in their manual, "
+            f"but do not copy the bracket tags verbatim.\n\n{retrieved_context}"
+        )
 
     template = _CLAIM_GUIDANCE_SYSTEM_PROMPT if needs_claim_guidance else _CONVERSATIONAL_SYSTEM_PROMPT
     system_prompt = template.format(household_type=household_type, context_instruction=context_instruction)

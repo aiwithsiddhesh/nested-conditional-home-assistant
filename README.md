@@ -137,15 +137,27 @@ Each RAG node (`kitchen_rag_node`, `laundry_rag_node`, `hvac_rag_node`,
 `insurance_rag_node`, `claim_escalation_node`) retrieves from its own
 source document through the same pipeline:
 
+- **PDF loading:** `PyPDFLoader` (`langchain_community.document_loaders`),
+  which returns one `Document` per page with page-number metadata
+  (`page_label`) attached — used instead of raw `pypdf.PdfReader` so
+  that page numbers survive chunking and can be cited in the final
+  answer. `.txt` sources are wrapped in a single `Document` for the
+  same interface.
 - **Embedding model:** `sentence-transformers/all-MiniLM-L6-v2` via
   `HuggingFaceEmbeddings`.
 - **Vector store:** FAISS, one index built per source document
   (kitchen manual, laundry manual, HVAC manual, insurance policy doc —
   four indexes total; `insurance_rag_node` and `claim_escalation_node`
   share the same policy index).
-- **Chunking:** `RecursiveCharacterTextSplitter`, chunk size 800,
-  chunk overlap 100.
+- **Chunking:** `RecursiveCharacterTextSplitter.split_documents`, chunk
+  size 800, chunk overlap 100 — splitting `Document` objects (not raw
+  text) so each chunk keeps its source page metadata.
 - **Retriever `k`:** 4 chunks returned per query.
+- **Context formatting:** `app.loaders.format_context` tags each
+  retrieved chunk with its source page, e.g. `[page 5] ...`, before it
+  reaches `response_node`. The response prompt tells the model it may
+  cite page numbers naturally in prose (e.g. "see page 5 of your
+  manual") but not copy the bracket tags verbatim.
 
 **Source documents** live under `data/manuals/`:
 
@@ -205,18 +217,18 @@ final_state = app.invoke(initial_state)
 - [x] Project scaffolding (`pyproject.toml`, `.python-version`, `.gitignore`)
 - [x] `.env` / `.env.example` — API key configuration
 - [x] `app/config.py` — settings loaded via `pydantic-settings`; also holds the file paths for each of the six retrieval sources (kitchen/laundry/hvac manuals, insurance policy doc) instead of hardcoding them in node code
-- [x] `app/loaders.py` — loads each source document, splits it with `RecursiveCharacterTextSplitter` (chunk size 800, overlap 100), embeds chunks with `sentence-transformers/all-MiniLM-L6-v2` via `HuggingFaceEmbeddings`, builds a FAISS index, and returns a retriever with `k=4` — one retriever per document, values sourced from `app/config.py` (see [Retrieval](#retrieval))
+- [x] `app/loaders.py` — loads each source document via `PyPDFLoader` (preserving page metadata), splits it with `RecursiveCharacterTextSplitter.split_documents` (chunk size 800, overlap 100), embeds chunks with `sentence-transformers/all-MiniLM-L6-v2` via `HuggingFaceEmbeddings`, builds a FAISS index, and returns a retriever with `k=4` — one retriever per document, values sourced from `app/config.py`; also exposes `format_context` (tags retrieved chunks with `[page N]`) and `make_rag_node` (shared factory: retriever → node function, with an optional `extra_fields` dict for nodes like `claim_escalation_node` that also set a flag) (see [Retrieval](#retrieval))
 - [x] `app/state.py` — shared graph state model
+- [x] `app/classifiers.py` — `make_classifier_node(schema, field_name, system_instruction)`, a shared factory used by all three classifier nodes (level-1, appliance, insurance) so the structured-output invoke/extract/return boilerplate lives in one place; each caller still owns its own pydantic schema and system instruction
 - [x] `app/nodes/classifier.py` — level-1 classifier node, using structured output (not string-contains parsing) so a bad parse can't cascade into the wrong level-2 classifier
-- [x] `app/nodes/appliance.py` — appliance classifier + kitchen/laundry/hvac RAG nodes, each calling `app/loaders.py` for its own retriever
-- [x] `app/nodes/insurance.py` — insurance classifier + coverage/claim-escalation RAG nodes (the latter also sets `needs_claim_guidance`), both calling `app/loaders.py` for the shared policy retriever
+- [x] `app/nodes/appliance.py` — appliance classifier + kitchen/laundry/hvac RAG nodes (built via `make_rag_node`), each with its own retriever from `app/loaders.py`
+- [x] `app/nodes/insurance.py` — insurance classifier + coverage/claim-escalation RAG nodes (built via `make_rag_node`; the claim one passes `extra_fields={"needs_claim_guidance": True}`), both sharing the same policy retriever from `app/loaders.py`
 - [x] `app/nodes/general.py` — general node
 - [x] `app/nodes/response.py` — final response node
 - [x] `app/graph.py` — builds and compiles the nested-conditional `StateGraph`
 - [x] `app/main.py` — non-interactive entrypoint (`python -m app.main <input>`), not a blocking CLI `input()` loop
 - [x] `sample_output/` — pre-generated results covering each of the six leaf branches (`kitchen.json`, `laundry.json`, `hvac.json`, `insurance_coverage_question.json`, `insurance_active_claim.json`, `general.json`); no separate `sample_data/` since the real source docs already live in `data/manuals/`
 - [x] `app/ui.py` — Streamlit chatbot UI: sidebar `household_type` selector, multi-turn chat backed by `st.session_state`, graph built once via `st.cache_resource`
-- [ ] `main.py` — currently a placeholder ("Hello from nested-conditional-home-assistant!"), not yet wired to the graph
 
 ## Setup
 
